@@ -20,6 +20,11 @@ proc RemoteExec {in_host in_port in_user in_pwd in_cmd out_res} {
 	for {set i 1} {$i < 3} {incr i} {
         spawn -noecho ssh $in_user@$in_host -p $in_port "$in_cmd"
         expect {
+		-nocase "Connection refused"
+		{
+			set response "Connection refused for $in_user@$in_host"
+			return -4
+		}
             -nocase "password:"
             {
                 send "$in_pwd\n"
@@ -69,6 +74,11 @@ proc RemoteUpload {in_host in_port in_user in_pwd in_lfile in_rfile out_res} {
 	set timeout 100
 	spawn scp -r -P $in_port $in_lfile $in_user@$in_host:$in_rfile
 	expect {
+		-nocase "Connection refused"
+		{
+			set response "Connection refused for $in_user@$in_host"
+			return -4
+		}
 		-nocase "password:"
 		{
 			send "$in_pwd\r"
@@ -111,6 +121,11 @@ proc RemoteDownload {in_host in_port in_user in_pwd in_lfile in_rfile out_res} {
 	set timeout 100
 	spawn scp -r -P $in_port $in_user@$in_host:$in_rfile $in_lfile 
 	expect {
+		-nocase "Connection refused"
+		{
+		set response "Connection refused for $in_user@$in_host"
+		return -4
+		}
 		-nocase "password:"
 		{
 			send "$in_pwd\r"
